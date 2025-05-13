@@ -4,6 +4,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ✅ Script anti-flash (se ejecuta INMEDIATAMENTE) -->
+  <script>
+    // 1. Verifica si hay un tema guardado en localStorage
+    const savedTheme = localStorage.getItem('theme');
+    
+    // 2. Si no hay tema guardado, usa la preferencia del sistema
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+    
+    // 3. Aplica el tema ANTES de que la página se cargue
+    if (initialTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.backgroundColor = '#13171e'; // Fondo oscuro inicial
+    } else {
+      document.documentElement.style.backgroundColor = 'white'; // Fondo claro inicial
+    }
+  </script>
+
   <title>Blog and Reviews</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>

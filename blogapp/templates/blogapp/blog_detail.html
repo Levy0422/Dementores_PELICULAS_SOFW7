@@ -12,7 +12,13 @@
     <h2 class="text-2xl font-semibold mb-4">Reviews</h2>
     {% for review in object.reviews.all %}
       <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4 transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
-        <p class="text-blue-700 dark:text-blue-300 font-medium">{{ review.reviewer.username }} - {{ review.rating }}/5 ⭐</p>
+        <p class="text-blue-700 dark:text-blue-300 font-medium">{{ review.reviewer.username }} - 
+          <p class="text-blue-700 dark:text-blue-300 font-medium">
+            {{ review.reviewer.username }} -
+            {% for i in "12345"|slice:":review.rating"|make_list %}⭐{% endfor %}
+            {% for i in "12345"|slice:"review.rating:"|make_list %}☆{% endfor %}
+          </p>
+          </p>
         <p class="text-gray-700 dark:text-gray-300">{{ review.comment }}</p>
         <a href="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 mt-2 inline-block">Add Comment</a>
         <ul class="mt-2 list-disc ml-6 text-gray-600 dark:text-gray-400">
@@ -24,6 +30,25 @@
     {% empty %}
       <p class="text-gray-400">No reviews yet. Be the first to add one.</p>
     {% endfor %}
-    <a href="{% url 'blogapp:add_review' object.pk %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">Add Review</a>
   </section>
+
+  <form method="post" action="{% url 'blogapp:add_review' object.pk %}" class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow mt-6">
+    {% csrf_token %}
+    <label for="id_rating" class="block text-lg font-semibold mb-2 dark:text-white">Your Rating:</label>
+    
+    <div class="flex flex-row-reverse justify-end space-x-reverse space-x-2">
+      {% for i in "54321"|make_list %}
+        <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="hidden peer" required>
+        <label for="star{{ i }}" class="cursor-pointer text-3xl text-gray-400 peer-checked:text-yellow-400 hover:text-yellow-300 transition-colors">★</label>
+      {% endfor %}
+    </div>
+  
+    <label for="id_comment" class="block mt-4 mb-2 font-semibold dark:text-white">Comment:</label>
+    <textarea name="comment" id="id_comment" rows="4" class="w-full p-2 rounded dark:bg-gray-700 dark:text-white" required></textarea>
+  
+    <button type="submit" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Submit Review</button>
+  </form>
+  
+
+
 {% endblock %}

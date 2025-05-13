@@ -1,45 +1,64 @@
-{% extends 'base.html' %}  <!-- Asume que el segundo template se llama base.html -->
+{% extends 'base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
-<div class="container mx-auto p-6">
-  <form method="POST" enctype="multipart/form-data" class="flex flex-col lg:flex-row gap-8 animate-fade-in">
-    <!-- Área de carga de archivos -->
-    <div class="w-full lg:w-1/3 bg-gray-200 dark:bg-gray-800 border-2 border-dashed border-gray-400 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center text-center transition-colors">
-      <svg class="w-12 h-12 text-gray-500 dark:text-gray-400 mb-2" fill="currentColor" viewBox="0 0 20 20">
+<h1 class="text-2xl font-bold mb-6 text-white">Publicar Entrada</h1>
+
+<form method="post" enctype="multipart/form-data" class="flex flex-col lg:flex-row gap-6 items-start">
+  {% csrf_token %}
+
+
+
+
+  {{ form.non_field_errors }}
+
+  <!-- Imagen -->
+  <div class="border-2 border-dashed border-gray-600 rounded-lg p-4 w-full lg:w-1/3 flex flex-col items-center justify-center">
+    <label for="id_image" class="flex flex-col items-center justify-center w-full cursor-pointer">
+      <svg class="w-10 h-10 text-gray-400 mb-2" fill="currentColor" viewBox="0 0 20 20">
         <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V7.828a2 2 0 00-.586-1.414l-4.828-4.828A2 2 0 0011.172 1H4zm8 2a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H7a1 1 0 110-2h3V6a1 1 0 011-1z"/>
       </svg>
-      <p class="mb-2 dark:text-gray-300">Suelta el archivo aquí</p>
-      <span class="text-gray-500 text-sm mb-3">o</span>
-      <label for="file-upload" class="bg-blue-500 hover:bg-blue-600 dark:bg-[#d0003f] dark:hover:bg-[#bb0039] px-4 py-2 rounded cursor-pointer text-white text-sm transition-colors">
-        Subir Archivo
-      </label>
-      <input type="file" id="file-upload" name="archivo" class="hidden">
+      <span class="text-sm text-gray-400">Suelta el archivo aquí o haz clic</span>
+      {{ form.image|add_class:"hidden" }}
+    </label>
+    {% if form.image.errors %}
+      <p class="text-red-500 text-sm mt-2">{{ form.image.errors.0 }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Título y contenido -->
+  <div class="w-full lg:w-2/3 space-y-4">
+    <!-- Título -->
+    <div>
+      <label for="id_title" class="block text-white font-medium mb-1">Título *</label>
+      {{ form.title|add_class:"w-full p-3 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500" }}
+      {% if form.title.errors %}
+        <p class="text-red-500 text-sm mt-1">{{ form.title.errors.0 }}</p>
+      {% endif %}
     </div>
 
-    <!-- Área de texto enriquecido -->
-    <div class="w-full lg:w-2/3 space-y-5">
-      <div>
-        <label class="block font-semibold mb-1 text-gray-700 dark:text-gray-300">Título *</label>
-        <input type="text" name="titulo" placeholder="Escribe aquí el título..." 
-               class="w-full p-3 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#d0003f] transition-colors">
-      </div>
-
-      <div>
-        <label class="block font-semibold mb-1 text-gray-700 dark:text-gray-300">Descripción *</label>
-        <div id="editor" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded h-64 border border-gray-300 dark:border-gray-600"></div>
-        <input type="hidden" name="contenido" id="contenido">
-      </div>
-
-      <button type="submit" 
-              class="bg-blue-500 hover:bg-blue-600 dark:bg-[#d0003f] dark:hover:bg-[#bb0039] px-6 py-2 rounded text-white transition-colors">
-        Publicar
-      </button>
+    <!-- Contenido -->
+    <div>
+      <label class="block text-white font-medium mb-1">Contenido *</label>
+      <div id="editor" class="w-full min-h-[200px] p-3 bg-gray-800 text-white border border-gray-600 rounded"></div>
+      {{ form.content|add_class:"hidden" }}
+      {% if form.content.errors %}
+        <p class="text-red-500 text-sm mt-1">{{ form.content.errors.0 }}</p>
+      {% endif %}
     </div>
-  </form>
-</div>
 
-<!-- Quill setup -->
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">
+      Publicar
+    </button>
+  </div>
+</form>
+
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
+
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializar Quill
   const quill = new Quill('#editor', {
     theme: 'snow',
     modules: {
@@ -49,14 +68,47 @@
         [{ 'header': 1 }, { 'header': 2 }],
         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
         [{ 'script': 'sub'}, { 'script': 'super' }],
-        ['link', 'image'],
-        ['clean']
+        [{ 'indent': '-1'}, { 'indent': '+1' }],
+        [{ 'direction': 'rtl' }],
+        [{ 'size': ['small', false, 'large', 'huge'] }],
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'font': [] }],
+        [{ 'align': [] }],
+        ['clean'],
+        ['link', 'image', 'video']
       ]
-    }
+    },
+    placeholder: 'Escribe tu contenido aquí...',
   });
 
-  document.querySelector('form').onsubmit = function () {
-    document.querySelector('#contenido').value = quill.root.innerHTML;
-  };
+  // Obtener el campo oculto del formulario
+  const contentField = document.getElementById('{{ form.content.id_for_label }}');
+  
+  // Si hay contenido previo, cargarlo en el editor
+  if (contentField.value) {
+    quill.root.innerHTML = contentField.value;
+  }
+
+  // Actualizar el campo oculto antes de enviar el formulario
+  document.querySelector('form').addEventListener('submit', function(e) {
+    contentField.value = quill.root.innerHTML;
+    
+    // Validar que el contenido no esté vacío
+    if (!quill.getText().trim()) {
+      e.preventDefault();
+      alert('El contenido no puede estar vacío');
+      return false;
+    }
+    
+    // Validar que el título no esté vacío
+    const titleField = document.querySelector('input[name="title"]');
+    if (!titleField.value.trim()) {
+      e.preventDefault();
+      alert('El título no puede estar vacío');
+      return false;
+    }
+  });
+});
 </script>
 {% endblock %}
