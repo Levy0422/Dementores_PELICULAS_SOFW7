@@ -1,13 +1,14 @@
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
 
 from .models import Blog, Review, Comment
-from .forms import BlogForm
-
+from .forms import BlogForm  
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.forms import UserCreationForm
 
 # Vista para listar blogs
 class BlogListView(ListView):
@@ -45,17 +46,20 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
 # Vista para crear reseñas (reviews)
 class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
-    fields = ['rating', 'comment']
+    fields = ['rating', 'comment']                # ← usa 'comment', no 'content'
     template_name = 'blogapp/review_form.html'
 
     def form_valid(self, form):
+        # asignar autor y blog
         form.instance.reviewer = self.request.user
-        print("Contenido recibido:", form.cleaned_data['content'])
         form.instance.blog_id = self.kwargs['pk']
+        # (ya NO intentes leer form.cleaned_data['content'])
         return super().form_valid(form)
 
     def get_success_url(self):
+        # Redirige de nuevo al detalle del blog
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.kwargs['pk']})
+
 
 
 # Vista para crear comentarios
