@@ -1,54 +1,78 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
-  <article class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
-    <h1 class="text-3xl font-bold mb-2">{{ object.title }}</h1>
-    <p class="text-gray-700 dark:text-gray-300 mb-4">{{ object.content }}</p>
-    <p class="text-sm text-gray-600 dark:text-gray-500">By {{ object.author.username }} - {{ object.created_at }}</p>
-  </article>
+<!-- Reseña principal -->
+<article class="max-w-5xl mx-auto px-6 py-10 bg-gray-900 text-white rounded-2xl shadow-xl flex flex-col md:flex-row gap-8 items-start">
+  <!-- Imagen -->
+  {% if object.image %}
+    <img src="{{ object.image.url }}" alt="{{ object.title }}" class="w-full md:w-1/3 rounded-xl shadow-md object-cover">
+  {% endif %}
 
-  <section class="mt-8">
-    <h2 class="text-2xl font-semibold mb-4">Reviews</h2>
-    {% for review in object.reviews.all %}
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4 transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
-        <p class="text-blue-700 dark:text-blue-300 font-medium">{{ review.reviewer.username }} - 
-          <p class="text-blue-700 dark:text-blue-300 font-medium">
-            {{ review.reviewer.username }} -
-            {% for i in "12345"|slice:":review.rating"|make_list %}⭐{% endfor %}
-            {% for i in "12345"|slice:"review.rating:"|make_list %}☆{% endfor %}
-          </p>
-          </p>
-        <p class="text-gray-700 dark:text-gray-300">{{ review.comment }}</p>
-        <a href="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 mt-2 inline-block">Add Comment</a>
-        <ul class="mt-2 list-disc ml-6 text-gray-600 dark:text-gray-400">
-          {% for comment in review.comments.all %}
-            <li><span class="font-semibold text-gray-900 dark:text-white">{{ comment.commenter.username }}</span>: {{ comment.content }}</li>
-          {% endfor %}
-        </ul>
+  <!-- Texto -->
+  <div class="flex-1">
+    <h1 class="text-3xl md:text-4xl font-bold mb-3 leading-tight">{{ object.title }}</h1>
+
+    <div class="flex items-center text-sm text-gray-400 mb-4 space-x-4">
+      <span>📝 Reseña</span>
+      <span class="uppercase tracking-wide">{{ object.author.username }}</span>
+      <span>{{ object.created_at|date:"F j, Y" }}</span>
+      <span class="text-yellow-400">⭐ 10/10</span> <!-- O usa object.rating si tienes -->
+    </div>
+
+    <div class="text-gray-300 space-y-4 text-justify">
+      <p>{{ object.content|linebreaks }}</p>
+    </div>
+  </div>
+</article>
+
+<!-- Sección de reviews -->
+<section class="max-w-5xl mx-auto mt-12 px-6">
+  <h2 class="text-2xl font-semibold text-white mb-4">Reseñas de usuarios</h2>
+
+  {% for review in object.reviews.all %}
+    <div class="bg-gray-800 p-6 rounded-xl shadow mb-6 text-white transition-all duration-500">
+      <div class="mb-2 text-blue-300 font-medium">
+        {{ review.reviewer.username }} —
+        {% for i in "12345"|slice:":review.rating"|make_list %}⭐{% endfor %}
+        {% for i in "12345"|slice:"review.rating:"|make_list %}☆{% endfor %}
       </div>
-    {% empty %}
-      <p class="text-gray-400">No reviews yet. Be the first to add one.</p>
-    {% endfor %}
-  </section>
+      <p class="text-gray-300">{{ review.comment }}</p>
 
-  <form method="post" action="{% url 'blogapp:add_review' object.pk %}" class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow mt-6">
+      <!-- Comentarios del review -->
+      <ul class="mt-4 ml-4 border-l-2 border-blue-600 pl-4 space-y-2 text-sm text-gray-400">
+        {% for comment in review.comments.all %}
+          <li>
+            <strong class="text-white">{{ comment.commenter.username }}</strong>: {{ comment.content }}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <!-- Link para comentar -->
+      <a href="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}" class="mt-3 inline-block text-blue-400 hover:text-blue-300 text-sm">➕ Añadir comentario</a>
+    </div>
+  {% empty %}
+    <p class="text-gray-400">No hay reseñas aún. Sé el primero en dejar una.</p>
+  {% endfor %}
+</section>
+
+<!-- Formulario para agregar review -->
+<section class="max-w-5xl mx-auto mt-10 px-6">
+  <form method="post" action="{% url 'blogapp:add_review' object.pk %}" class="bg-gray-800 p-6 rounded-xl shadow text-white">
     {% csrf_token %}
-    <label for="id_rating" class="block text-lg font-semibold mb-2 dark:text-white">Your Rating:</label>
+    <label for="id_rating" class="block text-lg font-semibold mb-3">Tu calificación:</label>
     
-    <div class="flex flex-row-reverse justify-end space-x-reverse space-x-2">
+    <div class="flex flex-row-reverse justify-end gap-2 mb-4">
       {% for i in "54321"|make_list %}
         <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="hidden peer" required>
-        <label for="star{{ i }}" class="cursor-pointer text-3xl text-gray-400 peer-checked:text-yellow-400 hover:text-yellow-300 transition-colors">★</label>
+        <label for="star{{ i }}" class="cursor-pointer text-3xl text-gray-500 peer-checked:text-yellow-400 hover:text-yellow-300 transition">★</label>
       {% endfor %}
     </div>
-  
-    <label for="id_comment" class="block mt-4 mb-2 font-semibold dark:text-white">Comment:</label>
-    <textarea name="comment" id="id_comment" rows="4" class="w-full p-2 rounded dark:bg-gray-700 dark:text-white" required></textarea>
-  
-    <button type="submit" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Submit Review</button>
-  </form>
-  
 
+    <label for="id_comment" class="block mb-2 font-semibold">Comentario:</label>
+    <textarea name="comment" id="id_comment" rows="4" class="w-full p-3 rounded bg-gray-700 text-white mb-4" required></textarea>
+
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded">Enviar reseña</button>
+  </form>
+</section>
 
 {% endblock %}
