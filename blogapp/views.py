@@ -9,6 +9,12 @@ from .models import Blog, Review, Comment
 from .forms import BlogForm  
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
+from .forms import BlogForm
+
+
+
+
+
 
 # Vista para listar blogs
 class BlogListView(ListView):
@@ -25,23 +31,24 @@ class BlogDetailView(DetailView):
 
 
 # Vista para crear blogs (requiere login)
-# Vista para crear blogs (requiere login)
 class BlogCreateView(LoginRequiredMixin, CreateView):
     form_class = BlogForm
     template_name = 'blogapp/blog_form.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'files': self.request.FILES})  # <--- Pasa los archivos correctamente
+        return kwargs
+
     def form_valid(self, form):
-        form.instance.author = self.request.user
-        response = super().form_valid(form)
-        form.save(author=self.request.user)
-        self.object = form.save()
+        blog = form.save(commit=False)
+        blog.author = self.request.user
+        blog.save()
         messages.success(self.request, "¡Blog creado exitosamente!")
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
-
-
 
 # Vista para crear reseñas (reviews)
 class ReviewCreateView(LoginRequiredMixin, CreateView):

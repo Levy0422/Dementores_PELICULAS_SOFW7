@@ -4,12 +4,8 @@
 {% block content %}
 <h1 class="text-2xl font-bold mb-6 text-white">Publicar Entrada</h1>
 
-<form method="post" enctype="multipart/form-data" class="flex flex-col lg:flex-row gap-6 items-start">
+<form method="post" enctype="multipart/form-data" action="{% url 'blogapp:add_blog' %}">
   {% csrf_token %}
-
-
-
-
   {{ form.non_field_errors }}
 
   <!-- Imagen -->
@@ -19,7 +15,7 @@
         <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V7.828a2 2 0 00-.586-1.414l-4.828-4.828A2 2 0 0011.172 1H4zm8 2a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H7a1 1 0 110-2h3V6a1 1 0 011-1z"/>
       </svg>
       <span class="text-sm text-gray-400">Suelta el archivo aquí o haz clic</span>
-      {{ form.image|add_class:"hidden" }}
+      <input type="file" name="image" id="id_image">
     </label>
     {% if form.image.errors %}
       <p class="text-red-500 text-sm mt-2">{{ form.image.errors.0 }}</p>
@@ -39,9 +35,8 @@
 
     <!-- Contenido -->
     <div>
-      <label class="block text-white font-medium mb-1">Contenido *</label>
-      <div id="editor" class="w-full min-h-[200px] p-3 bg-gray-800 text-white border border-gray-600 rounded"></div>
-      {{ form.content|add_class:"hidden" }}
+      <label for="id_content" class="block text-white font-medium mb-1">Contenido *</label>
+      {{ form.content }}
       {% if form.content.errors %}
         <p class="text-red-500 text-sm mt-1">{{ form.content.errors.0 }}</p>
       {% endif %}
@@ -52,63 +47,4 @@
     </button>
   </div>
 </form>
-
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Inicializar Quill
-  const quill = new Quill('#editor', {
-    theme: 'snow',
-    modules: {
-      toolbar: [
-        ['bold', 'italic', 'underline', 'strike'],
-        ['blockquote', 'code-block'],
-        [{ 'header': 1 }, { 'header': 2 }],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'script': 'sub'}, { 'script': 'super' }],
-        [{ 'indent': '-1'}, { 'indent': '+1' }],
-        [{ 'direction': 'rtl' }],
-        [{ 'size': ['small', false, 'large', 'huge'] }],
-        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-        [{ 'color': [] }, { 'background': [] }],
-        [{ 'font': [] }],
-        [{ 'align': [] }],
-        ['clean'],
-        ['link', 'image', 'video']
-      ]
-    },
-    placeholder: 'Escribe tu contenido aquí...',
-  });
-
-  // Obtener el campo oculto del formulario
-  const contentField = document.getElementById('{{ form.content.id_for_label }}');
-  
-  // Si hay contenido previo, cargarlo en el editor
-  if (contentField.value) {
-    quill.root.innerHTML = contentField.value;
-  }
-
-  // Actualizar el campo oculto antes de enviar el formulario
-  document.querySelector('form').addEventListener('submit', function(e) {
-    contentField.value = quill.root.innerHTML;
-    
-    // Validar que el contenido no esté vacío
-    if (!quill.getText().trim()) {
-      e.preventDefault();
-      alert('El contenido no puede estar vacío');
-      return false;
-    }
-    
-    // Validar que el título no esté vacío
-    const titleField = document.querySelector('input[name="title"]');
-    if (!titleField.value.trim()) {
-      e.preventDefault();
-      alert('El título no puede estar vacío');
-      return false;
-    }
-  });
-});
-</script>
 {% endblock %}
