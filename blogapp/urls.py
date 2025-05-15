@@ -1,4 +1,8 @@
 from django.urls import path
+from .views import admin_dashboard
+
+
+
 from .views import (
     BlogListView, BlogDetailView, BlogCreateView,
     ReviewCreateView, CommentCreateView,
@@ -22,4 +26,6 @@ urlpatterns = [
     path('blog/<int:pk>/review/', ReviewCreateView.as_view(), name='add_review'),
     path('blog/<int:blog_pk>/review/<int:review_pk>/comment/', 
          CommentCreateView.as_view(), name='add_comment'),
+    # Estadisticas
+     path('admin-dashboard/', admin_dashboard, name='admin_dashboard'),
 ]

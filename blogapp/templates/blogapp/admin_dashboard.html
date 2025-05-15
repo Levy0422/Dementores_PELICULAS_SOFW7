@@ -1,0 +1,194 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="bg-[#13171e] text-white min-h-screen font-sans">
+    <!-- Header: Logo + Título -->
+    <header class="flex items-center space-x-3 px-3 py-2 bg-[#1e2430] shadow-md sticky top-0 z-10">
+      <img src="{% static 'images/Spoilemos-light.png' %}" alt="Logo" class="h-8 w-auto" />
+      <h1 class="text-2xl font-black uppercase tracking-wide">Estadísticas</h1>
+    </header>
+
+    <!-- Contenido -->
+    <main class="container mx-auto px-3 py-4">
+
+      <!-- Tarjetas de métricas -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-center">
+        <div class="bg-[#1e2430] p-5 rounded-xl border-t-[4px] border-[#d0003f] shadow-sm hover:scale-[1.01] transition">
+          <div class="text-4xl mb-2">📝</div>
+          <p class="text-sm text-gray-400 uppercase tracking-widest">Total Blogs</p>
+          <p class="text-3xl font-extrabold mt-1">{{ total_blogs }}</p>
+        </div>
+
+        <div class="bg-[#1e2430] p-5 rounded-xl border-t-[4px] border-[#d0003f] shadow-sm hover:scale-[1.01] transition">
+          <div class="text-4xl mb-2">🗣️</div>
+          <p class="text-sm text-gray-400 uppercase tracking-widest">Total Reseñas</p>
+          <p class="text-3xl font-extrabold mt-1">{{ total_reviews }}</p>
+        </div>
+
+        <div class="bg-[#1e2430] p-5 rounded-xl border-t-[4px] border-[#d0003f] shadow-sm hover:scale-[1.01] transition">
+          <div class="text-4xl mb-2">⭐</div>
+          <p class="text-sm text-gray-400 uppercase tracking-widest">Rating Promedio</p>
+          <p class="text-3xl font-extrabold mt-1">{{ avg_rating }}</p>
+        </div>
+      </div>
+
+      <!-- Gráfico de actividad -->
+      <div class="bg-[#1e2430] p-4 rounded-lg">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-base font-bold uppercase flex items-center">
+            <span class="mr-2">📊</span> Actividad por Blog
+          </h2>
+        </div>
+
+        <!-- Gráfico -->
+        <div class="relative" style="height: 300px;">
+          <canvas id="reviewChart"></canvas>
+        </div>
+
+        <!-- Tabla de datos -->
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="text-left border-b border-gray-700">
+                <th class="pb-2 text-xs font-semibold text-gray-400 uppercase">Blog</th>
+                <th class="pb-2 text-xs font-semibold text-gray-400 uppercase">Reseñas</th>
+                <th class="pb-2 text-xs font-semibold text-gray-400 uppercase">Rating</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for blog in blog_review_data %}
+              <tr class="border-b border-gray-800 hover:bg-[#252d3a]">
+                <td class="py-2 text-sm font-medium">{{ blog.title|truncatechars:28 }}</td>
+                <td class="py-2 text-sm">{{ blog.review_count }}</td>
+                <td class="py-2 text-sm">{{ blog.avg_rating|default:"-" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const blogData = {{ blog_review_data|safe }};
+      const labels = blogData.map(b => b.title.length > 18 ? b.title.substring(0, 18) + '...' : b.title);
+      const data = blogData.map(b => b.review_count);
+      const avgRatings = blogData.map(b => b.avg_rating || 0);
+
+      const ctx = document.getElementById('reviewChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: ' Reseñas ',
+              data: data,
+              backgroundColor: '#d0003f',
+              borderRadius: 3,
+              borderWidth: 0,
+              barThickness: 20
+            },
+            {
+              label: ' Rating ',
+              data: avgRatings,
+              type: 'line',
+              borderColor: '#4fd1c5',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              pointBackgroundColor: '#4fd1c5',
+              pointRadius: 3,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: 'white',
+                font: { size: 11 },
+                padding: 10,
+                boxWidth: 12,
+                usePointStyle: true
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: '#1a202c',
+              titleColor: '#fff',
+              bodyColor: '#e2e8f0',
+              borderColor: '#2d3748',
+              borderWidth: 1,
+              padding: 10,
+              cornerRadius: 4,
+              displayColors: true,
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) label += ': ';
+                  label += context.parsed.y;
+                  return label;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: '#a0aec0',
+                font: { size: 10 },
+                maxRotation: 45,
+                minRotation: 45
+              }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: '#2d3748' },
+              ticks: {
+                color: '#a0aec0',
+                font: { size: 10 },
+                precision: 0
+              }
+            },
+            y1: {
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: {
+                color: '#a0aec0',
+                font: { size: 10 },
+                max: 5,
+                min: 0
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          }
+        }
+      });
+    });
+  </script>
+
+  <!-- Estilos adicionales -->
+  <style>
+    [x-cloak] { display: none !important; }
+    table { min-width: 100%; border-collapse: separate; border-spacing: 0; }
+    th, td { padding-right: 1rem; white-space: nowrap; }
+    tr:last-child { border-bottom: none; }
+    ::-webkit-scrollbar { height: 6px; width: 6px; }
+    ::-webkit-scrollbar-track { background: #1a202c; }
+    ::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 3px; }
+  </style>
+{% endblock %}

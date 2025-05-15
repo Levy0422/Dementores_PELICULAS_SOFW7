@@ -10,9 +10,31 @@ from .forms import BlogForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
 from .forms import BlogForm
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+from django.db.models import Avg, Count
 
 
+@staff_member_required
+def admin_dashboard(request):
+    total_blogs = Blog.objects.count()
+    total_reviews = Review.objects.count()
+    avg_rating = Review.objects.aggregate(Avg('rating'))['rating__avg'] or 0
 
+    # Datos para gráfico: número de reseñas por blog
+    blog_review_data = (
+        Blog.objects.annotate(review_count=Count('reviews'))
+        .values('title', 'review_count')
+    )
+
+    context = {
+        'total_blogs': total_blogs,
+        'total_reviews': total_reviews,
+        'avg_rating': round(avg_rating, 2),
+        'blog_review_data': list(blog_review_data),
+    }
+
+    return render(request, 'admin_dashboard.html', context)
 
 
 
