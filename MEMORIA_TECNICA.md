@@ -83,14 +83,8 @@ Una vez publicado, el blog aparece en la sección de publicaciones recientes en 
 
 ## 🎓 ¿Qué aprendimos?
 
-> [!QUOTE]
-> "Aprendí mucho de mis propios errores, lo que me ayudó a afianzar conceptos y evitar fallos comunes." – Cristofer Levy
-
 **Cristofer Levy:**  
 Durante el desarrollo de este trabajo, aprendí a corregir errores y a codificar utilizando Django, entendiendo mejor su estructura y cómo moverme dentro del framework. A lo largo del proceso, fui adquiriendo diversos tips útiles para mejorar mi flujo de trabajo y optimizar mi código. También aprendí mucho de mis propios errores, lo que me ayudó a afianzar conceptos y evitar fallos comunes. Además, profundicé en aspectos de Python que complementan el desarrollo en Django, lo que me permitió tener una visión más completa del entorno y de cómo aprovecharlo al máximo.
 
 **Carla Vásquez:**  
 Antes de este proyecto, desconocía cómo utilizar Python y trabajar con Django. A lo largo del desarrollo, aprendí a aplicar funciones básicas y comprender cómo se integran con el diseño del sitio. También entendí la importancia de equilibrar la parte visual con el funcionamiento correcto del blog para brindar una buena experiencia al usuario.
-
-> [!CAUTION]
-> La experiencia de aprendizaje fue tanto técnica como colaborativa. El trabajo en equipo fue clave para alcanzar un buen resultado final.
