@@ -51,6 +51,13 @@ class BlogDetailView(DetailView):
     template_name = 'blogapp/blog_detail.html'
     context_object_name = 'blog'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        blog = self.get_object()
+        promedio = blog.reviews.aggregate(avg_rating=Avg('rating'))['avg_rating']
+        context['average_rating'] = round(promedio, 1) if promedio else 0
+        return context #nuevo codigo
+
 
 # Vista para crear blogs (requiere login)
 class BlogCreateView(LoginRequiredMixin, CreateView):

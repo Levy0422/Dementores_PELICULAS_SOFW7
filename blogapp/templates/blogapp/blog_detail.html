@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+
 {% block content %}
 <!-- Reseña principal -->
 <article class="max-w-5xl mx-auto px-6 py-10 bg-gray-900 text-white rounded-2xl shadow-xl flex flex-col md:flex-row gap-8 items-start">
@@ -8,16 +9,20 @@
     <img src="{{ object.image.url }}" alt="{{ object.title }}" class="w-full md:w-1/3 rounded-xl shadow-md object-cover">
   {% endif %}
 
+
   <!-- Texto -->
   <div class="flex-1">
     <h1 class="text-3xl md:text-4xl font-bold mb-3 leading-tight">{{ object.title }}</h1>
+
 
     <div class="flex items-center text-sm text-gray-400 mb-4 space-x-4">
       <span>📝 Reseña</span>
       <span class="uppercase tracking-wide">{{ object.author.username }}</span>
       <span>{{ object.created_at|date:"F j, Y" }}</span>
-      <span class="text-yellow-400">⭐ 10/10</span> <!-- O usa object.rating si tienes -->
+      <span class="text-yellow-400">⭐ {{ average_rating }}/5</span>
+
     </div>
+
 
     <div class="text-gray-300 space-y-4 text-justify">
       <p>{{ object.content|linebreaks }}</p>
@@ -25,18 +30,26 @@
   </div>
 </article>
 
+
 <!-- Sección de reviews -->
 <section class="max-w-5xl mx-auto mt-12 px-6">
   <h2 class="text-2xl font-semibold text-white mb-4">Reseñas de usuarios</h2>
+
 
   {% for review in object.reviews.all %}
     <div class="bg-gray-800 p-6 rounded-xl shadow mb-6 text-white transition-all duration-500">
       <div class="mb-2 text-blue-300 font-medium">
         {{ review.reviewer.username }} —
-        {% for i in "12345"|slice:":review.rating"|make_list %}⭐{% endfor %}
-        {% for i in "12345"|slice:"review.rating:"|make_list %}☆{% endfor %}
+        {% for i in "12345"|make_list %}
+          {% if forloop.counter <= review.rating %}
+            ⭐
+          {% else %}
+            ☆
+          {% endif %}
+        {% endfor %}
       </div>
       <p class="text-gray-300">{{ review.comment }}</p>
+
 
       <!-- Comentarios del review -->
       <ul class="mt-4 ml-4 border-l-2 border-blue-600 pl-4 space-y-2 text-sm text-gray-400">
@@ -47,6 +60,7 @@
         {% endfor %}
       </ul>
 
+
       <!-- Link para comentar -->
       <a href="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}" class="mt-3 inline-block text-blue-400 hover:text-blue-300 text-sm">➕ Añadir comentario</a>
     </div>
@@ -55,12 +69,13 @@
   {% endfor %}
 </section>
 
+
 <!-- Formulario para agregar review -->
 <section class="max-w-5xl mx-auto mt-10 px-6">
   <form method="post" action="{% url 'blogapp:add_review' object.pk %}" class="bg-gray-800 p-6 rounded-xl shadow text-white">
     {% csrf_token %}
     <label for="id_rating" class="block text-lg font-semibold mb-3">Tu calificación:</label>
-    
+   
     <div class="flex flex-row-reverse justify-end gap-2 mb-4">
       {% for i in "54321"|make_list %}
         <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="hidden peer" required>
@@ -68,11 +83,14 @@
       {% endfor %}
     </div>
 
+
     <label for="id_comment" class="block mb-2 font-semibold">Comentario:</label>
     <textarea name="comment" id="id_comment" rows="4" class="w-full p-3 rounded bg-gray-700 text-white mb-4" required></textarea>
+
 
     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded">Enviar reseña</button>
   </form>
 </section>
+
 
 {% endblock %}
