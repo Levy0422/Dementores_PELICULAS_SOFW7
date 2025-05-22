@@ -57,7 +57,14 @@ class BlogDetailView(DetailView):
         blog = self.get_object()
         promedio = blog.reviews.aggregate(avg_rating=Avg('rating'))['avg_rating']
         context['average_rating'] = round(promedio, 1) if promedio else 0
-        return context #nuevo codigo
+
+        user_review_exists = False
+        if self.request.user.is_authenticated:
+            user_review_exists = blog.reviews.filter(reviewer=self.request.user).exists()
+        context['user_review_exists'] = user_review_exists
+
+        return context
+
 
 
 # Vista para crear blogs (requiere login)
