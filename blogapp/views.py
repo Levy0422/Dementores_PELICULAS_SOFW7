@@ -13,6 +13,7 @@ from .forms import BlogForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 from django.db.models import Avg, Count
+from django.contrib.auth.decorators import login_required
 
 
 @staff_member_required

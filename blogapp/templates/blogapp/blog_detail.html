@@ -25,7 +25,7 @@
 
 
     <div class="text-gray-300 space-y-4 text-justify">
-      <p>{{ object.content|linebreaks }}</p>
+      <p>{{ object.content|safe }}</p>
     </div>
   </div>
 </article>
@@ -72,24 +72,28 @@
 
 <!-- Formulario para agregar review -->
 <section class="max-w-5xl mx-auto mt-10 px-6">
-  <form method="post" action="{% url 'blogapp:add_review' object.pk %}" class="bg-gray-800 p-6 rounded-xl shadow text-white">
-    {% csrf_token %}
-    <label for="id_rating" class="block text-lg font-semibold mb-3">Tu calificación:</label>
-   
-    <div class="flex flex-row-reverse justify-end gap-2 mb-4">
-      {% for i in "54321"|make_list %}
-        <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="hidden peer" required>
-        <label for="star{{ i }}" class="cursor-pointer text-3xl text-gray-500 peer-checked:text-yellow-400 hover:text-yellow-300 transition">★</label>
-      {% endfor %}
+  {% if user.is_authenticated %}
+    <form method="post" action="{% url 'blogapp:add_review' object.pk %}" class="bg-gray-800 p-6 rounded-xl shadow text-white">
+      {% csrf_token %}
+      <label for="id_rating" class="block text-lg font-semibold mb-3">Tu calificación:</label>
+
+      <div class="flex flex-row-reverse justify-end gap-2 mb-4">
+        {% for i in "54321"|make_list %}
+          <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="hidden peer" required>
+          <label for="star{{ i }}" class="cursor-pointer text-3xl text-gray-500 peer-checked:text-yellow-400 hover:text-yellow-300 transition">★</label>
+        {% endfor %}
+      </div>
+
+      <label for="id_comment" class="block mb-2 font-semibold">Comentario:</label>
+      <textarea name="comment" id="id_comment" rows="4" class="w-full p-3 rounded bg-gray-700 text-white mb-4" required></textarea>
+
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded">Enviar reseña</button>
+    </form>
+  {% else %}
+    <div class="bg-gray-800 p-6 rounded-xl shadow text-white text-center">
+      <p class="mb-3">Debes <a href="{% url 'blogapp:login' %}?next={{ request.path }}" class="text-blue-400 hover:underline">iniciar sesión</a> para dejar una reseña.</p>
     </div>
-
-
-    <label for="id_comment" class="block mb-2 font-semibold">Comentario:</label>
-    <textarea name="comment" id="id_comment" rows="4" class="w-full p-3 rounded bg-gray-700 text-white mb-4" required></textarea>
-
-
-    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded">Enviar reseña</button>
-  </form>
+  {% endif %}
 </section>
 
 

@@ -23,7 +23,7 @@
   </div>
 
   <!-- Título y contenido -->
-  <div class="w-full lg:w-2/3 space-y-4">
+  <div class="w-full lg:w-2/3 space-y-4 mt-6">
     <!-- Título -->
     <div>
       <label for="id_title" class="block text-white font-medium mb-1">Título *</label>
@@ -47,4 +47,8 @@
     </button>
   </div>
 </form>
+
+<!-- Cargar scripts de CKEditor -->
+{{ form.media }}
+
 {% endblock %}
