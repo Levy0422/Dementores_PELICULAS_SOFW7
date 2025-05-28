@@ -44,6 +44,19 @@ class BlogListView(ListView):
     model = Blog  # ← Solo el modelo Blog, sin mezclar con otra clase
     template_name = 'blogapp/blog_list.html'
     context_object_name = 'blogs'
+    paginate_by = 4 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Blogs mejor calificados (solo los que tienen reseñas)
+        top_rated = Blog.objects.annotate(
+            avg_rating=Avg('reviews__rating'),
+            num_reviews=Count('reviews')
+        ).filter(num_reviews__gte=1).order_by('-avg_rating')[:5]
+
+        context['top_rated_blogs'] = top_rated
+        return context
 
 
 # Vista para ver el detalle de un blog

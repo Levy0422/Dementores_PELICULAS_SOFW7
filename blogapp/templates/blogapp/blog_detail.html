@@ -3,10 +3,11 @@
 
 {% block content %}
 <!-- Reseña principal -->
-<article class="max-w-5xl mx-auto px-6 py-10 bg-gray-900 text-white rounded-2xl shadow-xl flex flex-col md:flex-row gap-8 items-start">
+<article class="max-w-5xl mx-auto px-6 py-10 bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-white rounded-2xl shadow-xl flex flex-col md:flex-row gap-8 items-start">
   <!-- Imagen -->
   {% if object.image %}
-    <img src="{{ object.image.url }}" alt="{{ object.title }}" class="w-full md:w-1/3 rounded-xl shadow-md object-cover">
+    <img src="{{ object.image.url }}" alt="{{ object.title }}"
+     class="w-full md:w-2/5 lg:w-1/3 max-h-[500px] rounded-2xl shadow-lg object-cover object-center border border-gray-700">
   {% endif %}
 
 
@@ -17,14 +18,15 @@
 
     <div class="flex items-center text-sm text-gray-400 mb-4 space-x-4">
       <span>📝 Reseña</span>
-      <span class="uppercase tracking-wide">{{ object.author.username }}</span>
+      <span >🎬 Género: <span class="text-yellow-400">{{ blog.get_genre_display }}</span>      
+      <span >👤 Autor: <span class="uppercase tracking-wide text-white">{{ blog.author.username }}</span></span>
       <span>{{ object.created_at|date:"F j, Y" }}</span>
       <span class="text-yellow-400">⭐ {{ average_rating }}/5</span>
 
     </div>
 
 
-    <div class="text-gray-300 space-y-4 text-justify">
+    <div class="text-gray-300 space-y-12 text-justify">
       <p>{{ object.content|safe }}</p>
     </div>
   </div>
