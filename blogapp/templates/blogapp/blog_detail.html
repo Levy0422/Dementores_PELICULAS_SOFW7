@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 <!-- Reseña principal -->
 <article class="max-w-5xl mx-auto px-6 py-10 bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-white rounded-2xl shadow-xl flex flex-col md:flex-row gap-8 items-start">
@@ -10,37 +9,31 @@
      class="w-full md:w-2/5 lg:w-1/3 max-h-[500px] rounded-2xl shadow-lg object-cover object-center border border-gray-700">
   {% endif %}
 
-
   <!-- Texto -->
   <div class="flex-1">
-    <h1 class="text-3xl md:text-4xl font-bold mb-3 leading-tight">{{ object.title }}</h1>
+    <h1 class="text-3xl md:text-4xl font-bold mb-3 leading-tight text-gray-900 dark:text-white">{{ object.title }}</h1>
 
-
-    <div class="flex items-center text-sm text-gray-400 mb-4 space-x-4">
+    <div class="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-4 space-x-4">
       <span>📝 Reseña</span>
-      <span >🎬 Género: <span class="text-yellow-400">{{ blog.get_genre_display }}</span>      
-      <span >👤 Autor: <span class="uppercase tracking-wide text-white">{{ blog.author.username }}</span></span>
+      <span>🎬 Género: <span class="text-yellow-600 dark:text-yellow-400">{{ blog.get_genre_display }}</span></span>
+      <span>👤 Autor: <span class="uppercase tracking-wide text-gray-900 dark:text-white">{{ blog.author.username }}</span></span>
       <span>{{ object.created_at|date:"F j, Y" }}</span>
-      <span class="text-yellow-400">⭐ {{ average_rating }}/5</span>
-
+      <span class="text-yellow-600 dark:text-yellow-400">⭐ {{ average_rating }}/5</span>
     </div>
 
-
-    <div class="text-gray-300 space-y-12 text-justify">
+    <div class="text-gray-800 dark:text-gray-300 space-y-12 text-justify">
       <p>{{ object.content|safe }}</p>
     </div>
   </div>
 </article>
 
-
 <!-- Sección de reviews -->
 <section class="max-w-5xl mx-auto mt-12 px-6">
-  <h2 class="text-2xl font-semibold text-white mb-4">Reseñas de usuarios</h2>
-
+  <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Reseñas de usuarios</h2>
 
   {% for review in object.reviews.all %}
-    <div class="bg-gray-800 p-6 rounded-xl shadow mb-6 text-white transition-all duration-500">
-      <div class="mb-2 text-blue-300 font-medium">
+    <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow mb-6 text-gray-900 dark:text-white transition-all duration-500">
+      <div class="mb-2 text-blue-700 dark:text-blue-300 font-medium">
         {{ review.reviewer.username }} —
         {% for i in "12345"|make_list %}
           {% if forloop.counter <= review.rating %}
@@ -50,57 +43,52 @@
           {% endif %}
         {% endfor %}
       </div>
-      <p class="text-gray-300">{{ review.comment }}</p>
-
+      <p class="text-gray-800 dark:text-gray-300">{{ review.comment }}</p>
 
       <!-- Comentarios del review -->
-      <ul class="mt-4 ml-4 border-l-2 border-blue-600 pl-4 space-y-2 text-sm text-gray-400">
+      <ul class="mt-4 ml-4 border-l-2 border-blue-500 dark:border-blue-600 pl-4 space-y-2 text-sm text-gray-700 dark:text-gray-400">
         {% for comment in review.comments.all %}
           <li>
-            <strong class="text-white">{{ comment.commenter.username }}</strong>: {{ comment.content }}
+            <strong class="text-gray-900 dark:text-white">{{ comment.commenter.username }}</strong>: {{ comment.content }}
           </li>
         {% endfor %}
       </ul>
 
-
       <!-- Link para comentar -->
-      <a href="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}" class="mt-3 inline-block text-blue-400 hover:text-blue-300 text-sm">➕ Añadir comentario</a>
+      <a href="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}" class="mt-3 inline-block text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 text-sm">➕ Añadir comentario</a>
     </div>
   {% empty %}
-    <p class="text-gray-400">No hay reseñas aún. Sé el primero en dejar una.</p>
+    <p class="text-gray-600 dark:text-gray-400">No hay reseñas aún. Sé el primero en dejar una.</p>
   {% endfor %}
 </section>
-
 
 <!-- Formulario para agregar review -->
 <section class="max-w-5xl mx-auto mt-10 px-6">
   {% if user.is_authenticated %}
     {% if not user_review_exists %}
-      <form method="post" action="{% url 'blogapp:add_review' object.pk %}" class="bg-gray-800 p-6 rounded-xl shadow text-white">
+      <form method="post" action="{% url 'blogapp:add_review' object.pk %}" class="bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow text-gray-900 dark:text-white">
         {% csrf_token %}
         <label for="id_rating" class="block text-lg font-semibold mb-3">Tu calificación:</label>
 
         <div class="flex flex-row-reverse justify-end gap-2 mb-4">
           {% for i in "54321"|make_list %}
             <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="hidden peer" required>
-            <label for="star{{ i }}" class="cursor-pointer text-3xl text-gray-500 peer-checked:text-yellow-400 hover:text-yellow-300 transition">★</label>
+            <label for="star{{ i }}" class="cursor-pointer text-3xl text-gray-400 peer-checked:text-yellow-500 hover:text-yellow-400 dark:text-gray-500 dark:peer-checked:text-yellow-400 dark:hover:text-yellow-300 transition">★</label>
           {% endfor %}
         </div>
 
         <label for="id_comment" class="block mb-2 font-semibold">Comentario:</label>
-        <textarea name="comment" id="id_comment" rows="4" class="w-full p-3 rounded bg-gray-700 text-white mb-4" required></textarea>
+        <textarea name="comment" id="id_comment" rows="4" class="w-full p-3 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white mb-4" required></textarea>
 
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded">Enviar reseña</button>
       </form>
     {% else %}
-      <p class="text-yellow-400">Ya has dejado una reseña para este blog. Gracias por tu aporte.</p>
+      <p class="text-yellow-600 dark:text-yellow-400">Ya has dejado una reseña para este blog. Gracias por tu aporte.</p>
     {% endif %}
   {% else %}
-    <div class="bg-gray-800 p-6 rounded-xl shadow text-white text-center">
-      <p class="mb-3">Debes <a href="{% url 'blogapp:login' %}?next={{ request.path }}" class="text-blue-400 hover:underline">iniciar sesión</a> para dejar una reseña.</p>
+    <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow text-center text-gray-900 dark:text-white">
+      <p class="mb-3">Debes <a href="{% url 'blogapp:login' %}?next={{ request.path }}" class="text-blue-600 dark:text-blue-400 hover:underline">iniciar sesión</a> para dejar una reseña.</p>
     </div>
   {% endif %}
 </section>
-
-
 {% endblock %}
