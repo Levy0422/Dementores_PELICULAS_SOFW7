@@ -19,14 +19,14 @@
 
     <div class="space-y-6">
       {% for blog in object_list %}
-      <div class="flex bg-gray-800 rounded-lg p-4 shadow hover:shadow-lg transition">
+      <div class="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-4 shadow hover:shadow-lg transition">
         <!-- Imagen del blog -->
         {% if blog.image %}
         <img src="{{ blog.image.url }}" alt="{{ blog.title }}"
              class="object-contain rounded mr-4"
              style="width: 270px; height: 180px; flex-shrink: 0;">
         {% else %}
-        <div class="bg-gray-700 flex items-center justify-center text-gray-400 rounded mr-4"
+        <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 rounded mr-4"
              style="width: 270px; height: 180px; flex-shrink: 0;">
           No Image
         </div>
@@ -34,18 +34,15 @@
 
         <!-- Contenido del blog -->
         <div class="flex-1">
-          <h2 class="text-xl font-bold text-white mb-1">{{ blog.title }}</h2>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-1">{{ blog.title }}</h2>
 
-          
-
-
-          <p class="text-gray-400 text-sm mb-2 flex space-x-2 ">
-            <span class="text-gray-300 font-semibold">👤 Autor: {{ blog.author.username }}</span>
-            <span class="text-gray-400 font-semibold">|</span>
-            <span class="text-gray-300 font-semibold">{{ blog.created_at|date:"d M Y" }}</span>                                              
+          <p class="text-gray-600 dark:text-gray-400 text-sm mb-2 flex space-x-2">
+            <span class="font-semibold">👤 Autor: {{ blog.author.username }}</span>
+            <span class="font-semibold">|</span>
+            <span class="font-semibold">{{ blog.created_at|date:"d M Y" }}</span>                                              
           </p>
 
-           <p class="text-gray-200 mb-4 line-clamp-3">
+          <p class="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
             {{ blog.content|truncatewords:40|safe }}
           </p>
           <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="text-pink-500 hover:underline text-sm">
@@ -54,7 +51,7 @@
         </div>
       </div>
       {% empty %}
-      <p class="text-gray-400">No hay publicaciones todavía.</p>
+      <p class="text-gray-600 dark:text-gray-400">No hay publicaciones todavía.</p>
       {% endfor %}
     </div>
 
@@ -62,28 +59,28 @@
     {% if is_paginated %}
     <div class="mt-8 flex justify-center space-x-2">
       {% if page_obj.has_previous %}
-      <a href="?page=1" class="px-3 py-1 rounded bg-gray-700 text-white hover:bg-gray-600">&laquo;</a>
-      <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded bg-gray-700 text-white hover:bg-gray-600">&lsaquo;</a>
+      <a href="?page=1" class="px-3 py-1 rounded bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-600">&laquo;</a>
+      <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-600">&lsaquo;</a>
       {% endif %}
 
       {% for num in paginator.page_range %}
         {% if page_obj.number == num %}
         <span class="px-3 py-1 rounded bg-pink-600 text-white font-bold">{{ num }}</span>
         {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
-        <a href="?page={{ num }}" class="px-3 py-1 rounded bg-gray-700 text-white hover:bg-gray-600">{{ num }}</a>
+        <a href="?page={{ num }}" class="px-3 py-1 rounded bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-600">{{ num }}</a>
         {% endif %}
       {% endfor %}
 
       {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded bg-gray-700 text-white hover:bg-gray-600">&rsaquo;</a>
-      <a href="?page={{ paginator.num_pages }}" class="px-3 py-1 rounded bg-gray-700 text-white hover:bg-gray-600">&raquo;</a>
+      <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-600">&rsaquo;</a>
+      <a href="?page={{ paginator.num_pages }}" class="px-3 py-1 rounded bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-600">&raquo;</a>
       {% endif %}
     </div>
     {% endif %}
   </div>
 
   <!-- DERECHA: Mejor Calificados -->
-  <aside class="w-full lg:w-1/3 bg-gray-800 p-6 rounded-lg shadow-md h-fit self-start">
+  <aside class="w-full lg:w-1/3 bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-md h-fit self-start">
     <h2 class="text-xl font-bold mb-4 pb-2 border-b" style="color: #d10845; border-color: #d10845;">
       Mejor Calificados
     </h2>
@@ -98,7 +95,7 @@
              class="object-contain rounded"
              style="width: 150px; height: 105px; flex-shrink: 0;">
         {% else %}
-        <div class="bg-gray-700 flex items-center justify-center text-gray-400 rounded"
+        <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 rounded"
              style="width: 150px; height: 105px; flex-shrink: 0;">
           No Image
         </div>
@@ -106,11 +103,13 @@
 
         <!-- Texto -->
         <div class="flex flex-col justify-center overflow-hidden">
-          <h3 class="text-md font-semibold truncate max-w-xs" title="{{ blog.title }}">{{ blog.title }}</h3>
-          <span class="text-yellow-400 text-sm font-medium mt-1">
+          <h3 class="text-md font-semibold truncate max-w-xs text-gray-900 dark:text-white" title="{{ blog.title }}">
+            {{ blog.title }}
+          </h3>
+          <span class="text-yellow-500 text-sm font-medium mt-1">
             ⭐ {{ blog.avg_rating|floatformat:1 }} / 5.0
           </span>
-          <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="mt-1 text-pink-400 hover:underline text-sm">
+          <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="mt-1 text-pink-500 hover:underline text-sm">
             Leer más →
           </a>
         </div>
@@ -118,7 +117,7 @@
       {% endfor %}
     </div>
     {% else %}
-    <p class="text-gray-500">No hay blogs calificados aún.</p>
+    <p class="text-gray-600 dark:text-gray-400">No hay blogs calificados aún.</p>
     {% endif %}
   </aside>
 </div>

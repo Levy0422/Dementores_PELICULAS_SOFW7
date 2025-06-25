@@ -73,7 +73,7 @@
     }
   </style>
 </head>
-<body id="body" class="min-h-screen flex flex-col font-sans text-white transition-all duration-500">
+  <body id="body" class="min-h-screen flex flex-col font-sans text-gray-900 dark:text-white transition-colors duration-700 ease-in-out">
   {% csrf_token %}
   
   <!-- Mensajes flash -->
@@ -150,6 +150,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = savedTheme === 'dark' || (!savedTheme);
+    
     const html = document.documentElement;
     const icon = document.getElementById('theme-icon');
     const label = document.getElementById('theme-label');
